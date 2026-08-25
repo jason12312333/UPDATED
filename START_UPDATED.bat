@@ -1,37 +1,22 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+setlocal EnableExtensions
 cd /d "%~dp0"
+title UPDATED - easy_tdx
 
 echo ============================================================
 echo   UPDATED - easy_tdx Full Feature Launcher
 echo ============================================================
+echo Project: %CD%
 echo.
 
-where npm >nul 2>nul
-if errorlevel 1 (
-  echo [ERROR] Node.js/npm not found.
-  echo Please install Node.js LTS, then run this file again.
-  pause
-  exit /b 1
-)
+rem IMPORTANT: do not probe py -3.12 / py -3.13.
+rem New Windows Python Manager may pop up a runtime-install prompt and close the launcher.
+where python >nul 2>nul
+if errorlevel 1 goto :no_python
+set "PY_CMD=python"
 
-rem Prefer Python 3.12/3.13 because easy_tdx scientific extras are safest there.
-set "PY_CMD="
-py -3.12 -c "import sys; print(sys.version)" >nul 2>nul
-if not errorlevel 1 set "PY_CMD=py -3.12"
-if not defined PY_CMD (
-  py -3.13 -c "import sys; print(sys.version)" >nul 2>nul
-  if not errorlevel 1 set "PY_CMD=py -3.13"
-)
-if not defined PY_CMD (
-  where python >nul 2>nul
-  if errorlevel 1 (
-    echo [ERROR] Python not found. Please install Python 3.12 or 3.13.
-    pause
-    exit /b 1
-  )
-  set "PY_CMD=python"
-)
+where npm >nul 2>nul
+if errorlevel 1 goto :no_node
 
 echo [0/5] Runtime check...
 %PY_CMD% -c "import sys; print('Python:', sys.version); print('Executable:', sys.executable)"
@@ -64,7 +49,7 @@ if not exist "web-ui\dist\index.html" (
 
 echo.
 echo [3/5] Installing/updating easy_tdx core + Web dependencies...
-%PY_CMD% -m pip install --upgrade pip setuptools wheel
+%PY_CMD% -m pip install --upgrade pip setuptools wheel hatchling
 if errorlevel 1 goto :failed
 %PY_CMD% -m pip install -e ".[web]"
 if errorlevel 1 goto :failed
@@ -74,10 +59,8 @@ echo [4/5] Installing optional scientific dependencies...
 %PY_CMD% -m pip install -e ".[science]"
 if errorlevel 1 (
   echo.
-  echo [WARN] Scientific extras could not be installed with this Python version.
-  echo        Core easy_tdx, Web UI, market data, indicators, ChanLun,
-  echo        strategies, backtest, API and signal radar will still start.
-  echo        For maximum compatibility install Python 3.12 or 3.13.
+  echo [WARN] Optional scipy/science dependency could not be installed.
+  echo        The server will still start with the core easy_tdx + Web features.
   echo.
 )
 
@@ -88,11 +71,34 @@ echo API: http://127.0.0.1:8000/docs
 echo Stop: press Ctrl+C in this window.
 echo.
 %PY_CMD% -m easy_tdx
-exit /b %errorlevel%
+set "SERVER_RC=%errorlevel%"
+echo.
+echo easy_tdx server stopped. Exit code: %SERVER_RC%
+echo This window will stay open so the error can be read.
+pause
+exit /b %SERVER_RC%
+
+:no_python
+echo [ERROR] The command "python" was not found.
+echo This launcher will NOT request Python 3.12 or any other runtime automatically.
+echo Open CMD and run: python --version
+echo Then send the result to ChatGPT.
+pause
+exit /b 1
+
+:no_node
+echo [ERROR] Node.js/npm was not found.
+echo Open CMD and run: npm --version
+echo Then send the result to ChatGPT.
+pause
+exit /b 1
 
 :failed
 echo.
-echo [FAILED] Installation or build failed.
-echo Copy the error above or send a screenshot to ChatGPT.
+echo ============================================================
+echo [FAILED] UPDATED could not finish installation/build.
+echo The window is intentionally kept open.
+echo Send the last error lines to ChatGPT.
+echo ============================================================
 pause
 exit /b 1

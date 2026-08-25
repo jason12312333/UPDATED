@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import AdvancedDataView from './views/AdvancedDataView.vue'
 import ApiExplorerView from './views/ApiExplorerView.vue'
 import BacktestView from './views/BacktestView.vue'
 import BoardCenterView from './views/BoardCenterView.vue'
@@ -21,6 +22,7 @@ const routes = [
   { path: '/stock', name: 'stock', component: StockCenterView },
   { path: '/boards', name: 'boards', component: BoardCenterView },
   { path: '/scanner', name: 'scanner', component: MarketScannerView },
+  { path: '/advanced', name: 'advanced', component: AdvancedDataView },
   { path: '/extension', name: 'extension', component: ExtensionMarketView },
   { path: '/offline', name: 'offline', component: OfflineDataView },
   { path: '/features', name: 'features', component: FeatureCenterView },

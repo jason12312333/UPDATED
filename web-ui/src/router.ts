@@ -10,12 +10,11 @@ import ServerSettingsView from './views/ServerSettingsView.vue'
 import SignalRadarView from './views/SignalRadarView.vue'
 import StrategiesView from './views/StrategiesView.vue'
 
-// 保留 easy_tdx 原有回测入口，同时增加全功能中心和动态 OpenAPI 操作台。
-// / 继续兼容原来的单标的回测；/backtest 作为更清晰的显式别名。
+// UPDATED 默认进入全功能中心；原 easy_tdx 回测入口继续保留在 /backtest。
 const routes = [
-  { path: '/', name: 'backtest', component: BacktestView, alias: '/backtest' },
-  { path: '/features', name: 'features', component: FeatureCenterView },
+  { path: '/', name: 'features-home', component: FeatureCenterView, alias: '/features' },
   { path: '/api-explorer', name: 'api-explorer', component: ApiExplorerView },
+  { path: '/backtest', name: 'backtest', component: BacktestView },
   { path: '/portfolio', name: 'portfolio', component: PortfolioView },
   { path: '/optimize', name: 'optimize', component: OptimizeView },
   { path: '/compare', name: 'compare', component: CompareView },

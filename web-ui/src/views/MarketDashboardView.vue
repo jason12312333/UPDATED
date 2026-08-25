@@ -3,16 +3,16 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import echarts, { DOWN_COLOR, UP_COLOR } from '../echarts-setup'
 
-type IndexDef = { name: string; market: 'SH' | 'SZ'; code: string; short: string }
+type IndexDef = { name: string; market: 'SH' | 'SZ'; code: string }
 type Row = Record<string, any>
 
 const INDEXES: IndexDef[] = [
-  { name: '上证指数', short: '上证', market: 'SH', code: '000001' },
-  { name: '深证成指', short: '深成', market: 'SZ', code: '399001' },
-  { name: '创业板指', short: '创业板', market: 'SZ', code: '399006' },
-  { name: '沪深300', short: '沪深300', market: 'SH', code: '000300' },
-  { name: '上证50', short: '上证50', market: 'SH', code: '000016' },
-  { name: '中证1000', short: '中证1000', market: 'SH', code: '000852' },
+  { name: '上证指数', market: 'SH', code: '000001' },
+  { name: '深证成指', market: 'SZ', code: '399001' },
+  { name: '创业板指', market: 'SZ', code: '399006' },
+  { name: '沪深300', market: 'SH', code: '000300' },
+  { name: '上证50', market: 'SH', code: '000016' },
+  { name: '中证1000', market: 'SH', code: '000852' },
 ]
 
 const quotes = ref<Row[]>([])
@@ -122,7 +122,6 @@ async function loadMinute() {
     await nextTick()
     renderChart()
   } catch (e: any) {
-    // 指数实时卡片仍然可用；分时失败单独提示，不覆盖已有行情。
     error.value = `指数分时获取失败：${e?.message || e}`
   }
 }
@@ -137,6 +136,7 @@ function renderChart() {
   }
   const q = selectedQuote.value
   const pre = num(q.pre_close)
+  const lineColor = changeOf(q) >= 0 ? UP_COLOR : DOWN_COLOR
   const labels = rows.map((r) => {
     const raw = String(r.datetime || r.date || '')
     return raw.includes('T') ? raw.slice(11, 16) : raw.includes(' ') ? raw.slice(11, 16) : raw.slice(-5)
@@ -172,8 +172,8 @@ function renderChart() {
         data: values,
         showSymbol: false,
         smooth: false,
-        lineStyle: { width: 1.6, color: '#4da3ff' },
-        areaStyle: { opacity: 0.08, color: '#4da3ff' },
+        lineStyle: { width: 1.6, color: lineColor },
+        areaStyle: { opacity: 0.08, color: lineColor },
       },
       ...(pre > 0 ? [{
         name: '昨收',

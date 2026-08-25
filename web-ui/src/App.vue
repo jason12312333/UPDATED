@@ -13,6 +13,7 @@
         <RouterLink to="/scanner" active-class="active">全市场扫描</RouterLink>
         <RouterLink to="/advanced" active-class="active">高级数据</RouterLink>
         <RouterLink to="/backtest" active-class="active">回测</RouterLink>
+        <RouterLink to="/optimize" active-class="active">一键全测</RouterLink>
         <RouterLink to="/strategies" active-class="active">策略库</RouterLink>
         <RouterLink to="/signals" active-class="active">信号雷达</RouterLink>
         <RouterLink to="/extension" active-class="active">港美股/期货</RouterLink>
